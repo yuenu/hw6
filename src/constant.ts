@@ -10,3 +10,8 @@ export const COLOR = {
   FLASH_GREEN_BG: "rgba(0, 177, 93, 0.5)",
   FLASH_RED_BG: "rgba(255, 91, 90, 0.5)",
 };
+
+export const TRADE_TYPE = {
+  TRADE_HISTORY_API: 'tradeHistoryApi',
+  UPDATED_BTCPFC: 'update:BTCPFC'
+}
