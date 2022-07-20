@@ -197,8 +197,7 @@ function App() {
   const [tradeHistory, setTradeHistory] = useState<TradeHistoryType["data"]>(
     []
   );
-  // const [sellQuotes, setSellQuotes] = useState<TradeHistoryType["data"]>([]);
-  // const [buyQuotes, setBuyQuotes] = useState<TradeHistoryType["data"]>([]);
+
   const [currentPriceData, setCurrentPriceData] =
     useState<TradeHistoryType["data"]>();
 
