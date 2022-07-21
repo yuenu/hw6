@@ -27,6 +27,22 @@ export type UpdateBTCPFC = {
 };
 
 export enum DataType {
-  DELTA= 'delta',
-  SNAPSHOT= 'snapshot'
+  DELTA = "delta",
+  SNAPSHOT = "snapshot",
 }
+
+export type TablePropsType = {
+  data: {
+    price: string;
+    size: string;
+    total: number;
+    hint: boolean;
+  }[];
+  AllTotal: number;
+};
+
+export type RowProps = {
+  type?: "BUY" | "SELL";
+  hint?: boolean;
+  percentge?: number;
+};

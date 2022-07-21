@@ -2,10 +2,17 @@ import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { COLOR } from "./constant";
 import { ReactComponent as Arrow } from "./assets/icon/arrow.svg";
-import { TradeHistoryType, DataType, UpdateBTCPFC } from "./types";
+import {
+  TradeHistoryType,
+  DataType,
+  UpdateBTCPFC,
+  TablePropsType,
+} from "./types";
 import { parseNumber } from "./utils";
+import { PriceTable } from "./components";
+import { Row } from "./components";
 
-type DiaplyProps = {
+type RowProps = {
   type?: "BUY" | "SELL";
   hint?: boolean;
   percentge?: number;
@@ -32,80 +39,7 @@ const Heading = styled.div`
   padding: 10px;
 `;
 
-const Row = styled.div<DiaplyProps>`
-  display: flex;
-  padding: 0 10px;
-
-  & > span {
-    color: ${COLOR.TAB_HEAD_TEXT};
-    font-size: 12px;
-    margin-bottom: 10px;
-  }
-
-  & > span:nth-child(1) {
-    width: 40%;
-  }
-
-  & > span:nth-child(2) {
-    width: 20%;
-    text-align: end;
-  }
-
-  & > span:nth-child(3) {
-    width: 40%;
-    text-align: end;
-  }
-
-  & > div {
-    color: ${COLOR.TAB_HEAD_TEXT};
-    font-size: 14px;
-    margin-bottom: 10px;
-    background-color: ${(p) =>
-      p.hint
-        ? p.type === "BUY"
-          ? `${COLOR.FLASH_GREEN_BG}`
-          : `${COLOR.FLASH_RED_BG}`
-        : "transparent"};
-    transition: 500ms;
-  }
-
-  & > div:nth-child(1) {
-    width: 40%;
-    color: ${(p) =>
-      p.type === "BUY"
-        ? `${COLOR.BUY_QUOTE_PRICE}`
-        : `${COLOR.SELL_QUOTE_PRICE}`};
-  }
-
-  & > div:nth-child(2) {
-    width: 20%;
-    text-align: end;
-    color: ${COLOR.DEFAULT_TEXT};
-  }
-
-  & > div:nth-child(3) {
-    width: 40%;
-    text-align: end;
-    color: ${COLOR.DEFAULT_TEXT};
-    position:relative;
-
-    &::before {
-      content: '';
-      position: absolute;
-      right:0;
-      top:0;
-      height: 16px;
-      width: ${(p) => (p.percentge ? p.percentge : 0)}%;
-      background-color: ${(p) =>
-        p.hint
-          ? p.type === "BUY"
-            ? `${COLOR.BUY_QUOTE_ACCUMULATIVE}`
-            : `${COLOR.SELL_QUOTE_ACCUMULATIVE}`
-          : "transparent"};
-    }
-`;
-
-const CenterDiaply = styled.div<DiaplyProps>`
+const CenterDiaply = styled.div<RowProps>`
   height: 30px;
   color: ${(p) =>
     p.type === "BUY"
@@ -129,40 +63,6 @@ const CenterDiaply = styled.div<DiaplyProps>`
   }
 `;
 
-type PriceTablePropsType = {
-  priceType: "BUY" | "SELL";
-  // quotes: TradeHistoryType["data"];
-  quotes?: TablePropsType;
-};
-
-export function PriceTable({ priceType, quotes }: PriceTablePropsType) {
-  return (
-    <>
-      {quotes &&
-        quotes.data.length > 0 &&
-        quotes.data.slice(0, 7).map((quote) => {
-          let percentge = 0;
-          if (quotes.AllTotal > 0 && quote.total > 0) {
-            percentge = (quote.total / quotes.AllTotal) * 100;
-          }
-          console.log("total", quotes.AllTotal, quote.total);
-          return (
-            <Row
-              type={priceType}
-              key={quote.price}
-              hint={quote.hint}
-              percentge={percentge}
-            >
-              <div>{parseNumber(quote.price)}</div>
-              <div>{quote.size}</div>
-              <div>{quote.total}</div>
-            </Row>
-          );
-        })}
-    </>
-  );
-}
-
 export enum WebSocketState {
   CONNECTING = 0,
   OPEN,
@@ -179,16 +79,6 @@ const msg = {
 const msg2 = {
   op: "subscribe",
   args: ["tradeHistoryApi:BTCPFC"],
-};
-
-type TablePropsType = {
-  data: {
-    price: string;
-    size: string;
-    total: number;
-    hint: boolean;
-  }[];
-  AllTotal: number;
 };
 
 type SequenceType = {
