@@ -8,6 +8,7 @@ import { parseNumber } from "./utils";
 type DiaplyProps = {
   type?: "BUY" | "SELL";
   hint?: boolean;
+  percentge?: number;
 };
 
 const Container = styled.div`
@@ -62,8 +63,8 @@ const Row = styled.div<DiaplyProps>`
     background-color: ${(p) =>
       p.hint
         ? p.type === "BUY"
-          ? `${COLOR.BUY_QUOTE_ACCUMULATIVE}`
-          : `${COLOR.SELL_QUOTE_ACCUMULATIVE}`
+          ? `${COLOR.FLASH_GREEN_BG}`
+          : `${COLOR.FLASH_RED_BG}`
         : "transparent"};
     transition: 500ms;
   }
@@ -86,7 +87,22 @@ const Row = styled.div<DiaplyProps>`
     width: 40%;
     text-align: end;
     color: ${COLOR.DEFAULT_TEXT};
+    position:relative;
 
+    &::before {
+      content: '';
+      position: absolute;
+      right:0;
+      top:0;
+      height: 16px;
+      width: ${(p) => (p.percentge ? p.percentge : 0)}%;
+      background-color: ${(p) =>
+        p.hint
+          ? p.type === "BUY"
+            ? `${COLOR.BUY_QUOTE_ACCUMULATIVE}`
+            : `${COLOR.SELL_QUOTE_ACCUMULATIVE}`
+          : "transparent"};
+    }
 `;
 
 const CenterDiaply = styled.div<DiaplyProps>`
@@ -125,11 +141,18 @@ export function PriceTable({ priceType, quotes }: PriceTablePropsType) {
       {quotes &&
         quotes.data.length > 0 &&
         quotes.data.slice(0, 7).map((quote) => {
-          // if(quotes.AllTotal > 0 && quote.total > 0)
-          // console.log('percentge', quote.total / quotes.AllTotal)
-
+          let percentge = 0;
+          if (quotes.AllTotal > 0 && quote.total > 0) {
+            percentge = (quote.total / quotes.AllTotal) * 100;
+          }
+          console.log("total", quotes.AllTotal, quote.total);
           return (
-            <Row type={priceType} key={quote.price} hint={quote.hint}>
+            <Row
+              type={priceType}
+              key={quote.price}
+              hint={quote.hint}
+              percentge={percentge}
+            >
               <div>{parseNumber(quote.price)}</div>
               <div>{quote.size}</div>
               <div>{quote.total}</div>
@@ -333,8 +356,10 @@ function App() {
               if (foundTarget) {
                 const targetIndex = newBids.data.indexOf(target[0]);
                 if (newBid[1] === "0") {
+                  prevBids.AllTotal = prevBids.AllTotal - target[0].total;
                   newBids.data.splice(targetIndex, 1);
                 } else {
+                  prevBids.AllTotal = prevBids.AllTotal + target[0].total;
                   newCeilData.total = target[0].total + parseInt(newBid[1], 10);
                   newBids.data.splice(targetIndex, 1, newCeilData);
                 }
@@ -383,8 +408,11 @@ function App() {
 
               if (foundTarget) {
                 const targetIndex = newAsks.data.indexOf(target[0]);
-                if (newAsk[1] === "0") newAsks.data.splice(targetIndex, 1);
-                else {
+                if (newAsk[1] === "0") {
+                  prevAsks.AllTotal = prevAsks.AllTotal - target[0].total;
+                  newAsks.data.splice(targetIndex, 1);
+                } else {
+                  prevAsks.AllTotal = prevAsks.AllTotal + target[0].total;
                   newCeilData.total = target[0].total + parseInt(newAsk[1], 10);
                   newAsks.data.splice(targetIndex, 1, newCeilData);
                 }
